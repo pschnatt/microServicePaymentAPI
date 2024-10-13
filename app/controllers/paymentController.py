@@ -42,19 +42,22 @@ async def retrievePaymentDetail():
 @router.get("/{paymentId}")
 async def getAccountFromSystem(paymentId: str):
     try:
-        response = PaymentService.getPaymentById(paymentId)
-        
+        response = payment_service.getPaymentById(paymentId)
+
         return JSONResponse(status_code=response["statusCode"], content={
             "message": "Payment fetched successfully", 
             "payment": response["payment"]
         })
     except PaymentException as e:
         raise HTTPException(status_code=e.status_code, detail=e.detail)
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {str(e)}")
 
 @router.put("/{paymentId}/update")
 async def updateUserPaymentDetail(paymentMutation: PaymentMutation, paymentId: str):
     try:
-        response = PaymentService.updatePayment(paymentMutation, paymentId)
+        response = payment_service.updatePayment(paymentMutation, paymentId)
         return JSONResponse(status_code=response["statusCode"], content={
             "message": "Payment updated successfully", 
             "paymentId": response["paymentId"]
