@@ -2,49 +2,49 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
 
 from app.helpers.exception import PaymentException
-from microServicePaymentAPI.app.models.paymentBaseModel import PaymentMutation
-from microServicePaymentAPI.app.services.paymentService import PaymentService
+from app.models.paymentBaseModel import PaymentMutation
+from app.services.paymentService import PaymentService
 
 router = APIRouter()
 
 PaymentMutation = PaymentService()
 
 @router.post("/{userId}/create")
-async def addPayment(paymentMutation : PaymentMutation, userId: str):
+async def createPaymentDetails(paymentMutation : PaymentMutation, userId: str):
     try:
-      response = PaymentService.createPayment(paymentMutation, userId)
-      return JSONResponse(status_code=response["statusCode"], content={"message": "Restaurant created successfully", "restaurantId": response["restaurantId"]})
+      response = PaymentService.createPaymentDetail(paymentMutation, userId)
+      return JSONResponse(status_code=response["statusCode"], content={"message": "Payment created successfully", "paymentId": response["paymentId"]})
     except PaymentException as e:
         raise HTTPException(status_code=e.status_code, detail=e.detail)
 
 @router.get("/get")
-async def retrievePayment():
+async def retrievePaymentDetail():
     try:
         response = PaymentService.getPaymentList()
-        return JSONResponse(status_code=response["statusCode"], content={"message": "Restaurants fetched successfully", "restaurants": response["restaurants"]})
+        return JSONResponse(status_code=response["statusCode"], content={"message": "Payments fetched successfully", "restaurants": response["restaurants"]})
     except PaymentException as e:
         raise HTTPException(status_code=e.status_code, detail=e.detail)
 
-@router.get("/get/{restaurantId}")
-async def retrievePaymentById(restaurantId: str):
+@router.get("/get/{paymentId}")
+async def retrievePaymentById(paymentId: str):
     try:
-        response = PaymentService.getPaymentById(restaurantId)
-        return JSONResponse(status_code=response["statusCode"], content={"message": "Restaurant fetched successfully", "restaurant": response["restaurant"]})
+        response = PaymentService.getPaymentById(paymentId)
+        return JSONResponse(status_code=response["statusCode"], content={"message": "Payment fetched successfully", "payment": response["payment"]})
     except PaymentException as e:
         raise HTTPException(status_code=e.status_code, detail=e.detail)
 
 @router.put("/{userId}/update/{restaurantId}")
-async def updatePayment(paymentMutation : PaymentMutation, restaurantId: str, userId : str):
+async def updateUserPaymentDetail(paymentMutation : PaymentMutation, restaurantId: str, userId : str):
     try:
         response = PaymentService.updatePayment(paymentMutation, restaurantId, userId)
         return JSONResponse(status_code=response["statusCode"], content={"message": "Restaurant updated successfully", "restaurantId": response["restaurantId"]})
     except PaymentException as e:
         raise HTTPException(status_code=e.status_code, detail=e.detail)
 
-@router.delete("/{userId}/delete/{restaurantId}")
-async def deletePayment(restaurantId: str, userId: str):
-    try:
-        response = PaymentService.deletePayment(restaurantId, userId)
-        return JSONResponse(status_code=response["statusCode"], content={"message": "Restaurant deleted successfully", "restaurantId": response["restaurantId"]})
-    except PaymentException as e:
-        raise HTTPException(status_code=e.status_code, detail=e.detail)
+# @router.delete("/{userId}/delete/{restaurantId}")
+# async def deletePayment(restaurantId: str, userId: str):
+#     try:
+#         response = PaymentService.deletePayment(restaurantId, userId)
+#         return JSONResponse(status_code=response["statusCode"], content={"message": "Restaurant deleted successfully", "restaurantId": response["restaurantId"]})
+#     except PaymentException as e:
+#         raise HTTPException(status_code=e.status_code, detail=e.detail)

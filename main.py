@@ -1,8 +1,8 @@
 from fastapi import FastAPI
-from microServicePaymentAPI.app.controllers.paymentController import router as restaurantController
+from app.controllers.paymentController import router as paymentController
 app = FastAPI()
 
-app.include_router(restaurantController, prefix="/api/restaurant")
+app.include_router(paymentController, prefix="/api/payment")
 
 if __name__ == "__main__":
     import uvicorn
