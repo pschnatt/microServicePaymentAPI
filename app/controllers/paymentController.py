@@ -1,50 +1,63 @@
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
-
+from app.services.paymentService import PaymentService
 from app.helpers.exception import PaymentException
 from app.models.paymentBaseModel import PaymentMutation
-from app.services.paymentService import PaymentService
 
 router = APIRouter()
+payment_service = PaymentService()
 
-PaymentMutation = PaymentService()
-
-@router.post("/{userId}/create")
-async def createPaymentDetails(paymentMutation : PaymentMutation, userId: str):
+# Correct route paths with leading slashes
+@router.post("/{userId}")
+async def createPaymentDetails(paymentMutation: PaymentMutation, userId: str):
     try:
-      response = PaymentService.createPaymentDetail(paymentMutation, userId)
-      return JSONResponse(status_code=response["statusCode"], content={"message": "Payment created successfully", "paymentId": response["paymentId"]})
+        
+        response = payment_service.createPaymentDetail(paymentMutation, userId)
+        return JSONResponse(status_code=response["statusCode"], content={
+            "message": "Payment created successfully", 
+            "paymentId": response["paymentId"]
+        })
     except PaymentException as e:
         raise HTTPException(status_code=e.status_code, detail=e.detail)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {str(e)}")
 
-@router.get("/get")
+@router.get("/payments")
 async def retrievePaymentDetail():
     try:
-        response = PaymentService.getPaymentList()
-        return JSONResponse(status_code=response["statusCode"], content={"message": "Payments fetched successfully", "restaurants": response["restaurants"]})
+
+        # Call the instance method getPaymentList()
+        response = payment_service.getPaymentList()
+        
+        return JSONResponse(status_code=response["statusCode"], content={
+            "message": "Payments fetched successfully", 
+            "payments": response["payments"]  # Corrected key from "restaurants" to "payments"
+        })
     except PaymentException as e:
         raise HTTPException(status_code=e.status_code, detail=e.detail)
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {str(e)}")
 
-@router.get("/get/{paymentId}")
+@router.get("/{paymentId}")
 async def getAccountFromSystem(paymentId: str):
     try:
         response = PaymentService.getPaymentById(paymentId)
-        return JSONResponse(status_code=response["statusCode"], content={"message": "Payment fetched successfully", "payment": response["payment"]})
+        
+        return JSONResponse(status_code=response["statusCode"], content={
+            "message": "Payment fetched successfully", 
+            "payment": response["payment"]
+        })
     except PaymentException as e:
         raise HTTPException(status_code=e.status_code, detail=e.detail)
 
 @router.put("/{paymentId}/update")
-async def updateUserPaymentDetail(paymentMutation : PaymentMutation, paymentId: str):
+async def updateUserPaymentDetail(paymentMutation: PaymentMutation, paymentId: str):
     try:
         response = PaymentService.updatePayment(paymentMutation, paymentId)
-        return JSONResponse(status_code=response["statusCode"], content={"message": "payment updated successfully", "paymentId": response["paymentId"]})
+        return JSONResponse(status_code=response["statusCode"], content={
+            "message": "Payment updated successfully", 
+            "paymentId": response["paymentId"]
+        })
     except PaymentException as e:
         raise HTTPException(status_code=e.status_code, detail=e.detail)
-
-# @router.delete("/{userId}/delete/{restaurantId}")
-# async def deletePayment(restaurantId: str, userId: str):
-#     try:
-#         response = PaymentService.deletePayment(restaurantId, userId)
-#         return JSONResponse(status_code=response["statusCode"], content={"message": "Restaurant deleted successfully", "restaurantId": response["restaurantId"]})
-#     except PaymentException as e:
-#         raise HTTPException(status_code=e.status_code, detail=e.detail)

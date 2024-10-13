@@ -3,9 +3,10 @@ from typing import Optional
 from pydantic import BaseModel
 from enum import Enum
 
-
-
 class PaymentMutation(BaseModel):
+
+  
+  created_by: str
 
   paymentID: str
   paymentDate: datetime

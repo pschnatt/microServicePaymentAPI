@@ -17,7 +17,8 @@ class PaymentService:
       try:
         paymentData = paymentMutation.model_dump()
 
-    
+
+        paymentData["created_by"] = userId
         paymentData["created_at"] = datetime.now().strftime("%d%m%Y") 
         paymentData["updated_at"] = datetime.now().strftime("%d%m%Y")
         
