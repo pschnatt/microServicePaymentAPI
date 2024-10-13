@@ -26,18 +26,18 @@ async def retrievePaymentDetail():
         raise HTTPException(status_code=e.status_code, detail=e.detail)
 
 @router.get("/get/{paymentId}")
-async def retrievePaymentById(paymentId: str):
+async def getAccountFromSystem(paymentId: str):
     try:
         response = PaymentService.getPaymentById(paymentId)
         return JSONResponse(status_code=response["statusCode"], content={"message": "Payment fetched successfully", "payment": response["payment"]})
     except PaymentException as e:
         raise HTTPException(status_code=e.status_code, detail=e.detail)
 
-@router.put("/{userId}/update/{restaurantId}")
-async def updateUserPaymentDetail(paymentMutation : PaymentMutation, restaurantId: str, userId : str):
+@router.put("/{paymentId}/update")
+async def updateUserPaymentDetail(paymentMutation : PaymentMutation, paymentId: str):
     try:
-        response = PaymentService.updatePayment(paymentMutation, restaurantId, userId)
-        return JSONResponse(status_code=response["statusCode"], content={"message": "Restaurant updated successfully", "restaurantId": response["restaurantId"]})
+        response = PaymentService.updatePayment(paymentMutation, paymentId)
+        return JSONResponse(status_code=response["statusCode"], content={"message": "payment updated successfully", "paymentId": response["paymentId"]})
     except PaymentException as e:
         raise HTTPException(status_code=e.status_code, detail=e.detail)
 

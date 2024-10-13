@@ -131,7 +131,7 @@ class PaymentService:
 
             raise PaymentException(500, f"Error fetching account from system by ID: {str(e)}")
         
-    def updatePayment(self, paymentMutation: PaymentMutation, paymentId: str, userId: str):
+    def updatePayment(self, paymentMutation: PaymentMutation, paymentId: str):
         try:
             paymentData = paymentMutation.model_dump()
 
@@ -182,26 +182,4 @@ class PaymentService:
         except Exception as e:
             raise PaymentException(500, f"Error updating payment: {str(e)}")
     
-    def deletePayment(self, paymentId: str, userId: str):
-      try:
-          existing_payment = self.collection.find_one({"_id": ObjectId(paymentId)})
-          if not existing_payment:
-              raise PaymentException(404, "Restaurant not found.")
           
-          updateData = {
-              "$set": {
-                  "status": 0,
-                  "updated_by": userId,
-                  "updated_when": datetime.now().strftime("%d%m%Y")
-              }
-          }
-          result = self.collection.update_one({"_id": ObjectId(restaurantId)}, updateData)
-
-          
-          return {"statusCode": 200, "paymentId": paymentId}
-
-      except PaymentException as e:
-          raise e
-      except Exception as e:
-          raise PaymentException(500, f"Error updating payment: {str(e)}")
-
