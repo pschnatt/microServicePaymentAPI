@@ -34,9 +34,13 @@ class PaymentService:
       
     def getPaymentList(self):
       try:
-        payments = list(self.collection.find({"status": 1}))
+        
+        payments = list(self.collection.find())
+        print(payments)
 
         paymentList = [{
+            "_id": str(payment["_id"]),
+            "created_by": payment["created_by"],
             "paymentId": str(payment["_id"]),
             "paymentDate": payment["paymentDate"],
             "paymentAmount": payment["paymentAmount"],
@@ -55,8 +59,8 @@ class PaymentService:
             "AccountCurrency": payment["AccountCurrency"],
             "AccountLimit": payment["AccountLimit"],
 
-            "created_at": payment["created_at"],
-            "updated_at": payment["updated_at"]   
+            "created_at": str(payment["created_at"]),
+            "updated_at": str(payment["updated_at"])   
         } for payment in payments]
 
         return {"statusCode": 200, "payments": paymentList}  
@@ -64,24 +68,93 @@ class PaymentService:
       except Exception as e:
         raise PaymentException(500, f"Error fetching payment list: {str(e)}")
     
-    def getPaymentById(self, paymentId: str):
+    def getPaymentByPaymentId(self, paymentId: str):
         try:
-            payment = self.collection.find_one({"_id": ObjectId(paymentId), "status": 1})
+            # Find the payment by paymentId in the collection
+            payment = self.collection.find_one({"_id": ObjectId(paymentId)})
+
+            # If no payment is found, raise a PaymentException
+            if payment is None:
+                raise PaymentException(404, "Payment not found.")
+
+            # Structure the payment data as a dictionary
+            paymentData = {
+                "_id": str(payment["_id"]),
+                "created_by": payment["created_by"],
+                "paymentDate": payment["paymentDate"].isoformat(),
+                "paymentAmount": payment["paymentAmount"],
+                "paymentStatus": payment["paymentStatus"],
+                "paymentMethod": payment["paymentMethod"],
+                "paymentCurrency": payment["paymentCurrency"],
+                "paymentType": payment["paymentType"],
+                "paymentDescription": payment["paymentDescription"],
+                "AccountID": payment["AccountID"],
+                "AccountName": payment["AccountName"],
+                "AccountType": payment["AccountType"],
+                "AccountNumber": payment["AccountNumber"],
+                "AccountBalance": payment["AccountBalance"],
+                "AccountStatus": payment["AccountStatus"],
+                "AccountCurrency": payment["AccountCurrency"],
+                "AccountLimit": payment["AccountLimit"],
+                "created_at": payment["created_at"],
+                "updated_at": payment["updated_at"]
+            }
+
+            # Return a success response with the payment data
+            return {"statusCode": 200, "payment": paymentData}
+
+        except PaymentException as e:
+            # Re-raise the custom exception if it's a PaymentException
+            raise e
+        except Exception as e:
+            # Raise a PaymentException for any other error
+            raise PaymentException(500, f"Error fetching payment by ID: {str(e)}")
+           
+    def getAllPaymentsByUserId(self, userId: str):
+        try:
+            payments = list(self.collection.find({"created_by": userId}))
+
+            paymentList = [{
+                "_id": str(payment["_id"]),
+
+                "created_by": payment["created_by"],
+                "paymentDate": payment["paymentDate"].isoformat(),
+                "paymentAmount": payment["paymentAmount"],
+                "paymentStatus": payment["paymentStatus"],
+                "paymentMethod": payment["paymentMethod"],
+                "paymentCurrency": payment["paymentCurrency"],
+                "paymentType": payment["paymentType"],
+                "paymentDescription": payment["paymentDescription"],
+
+                "AccountID": payment["AccountID"],
+                "AccountName": payment["AccountName"],
+                "AccountType": payment["AccountType"],
+                "AccountNumber": payment["AccountNumber"],
+                "AccountBalance": payment["AccountBalance"],
+                "AccountStatus": payment["AccountStatus"],
+                "AccountCurrency": payment["AccountCurrency"],
+                "AccountLimit": payment["AccountLimit"],
+
+                "created_at": payment["created_at"],
+                "updated_at": payment["updated_at"]
+            } for payment in payments]
+
+            return {"statusCode": 200, "payments": paymentList}
+        
+        except PaymentException as e:
+            raise e
+        except Exception as e:
+            raise PaymentException(500, f"Error fetching payments by user ID: {str(e)}")
+
+    def getAccountInPaymentFromSystemByPaymentId(self, paymentId: str):
+        try:
+            payment = self.collection.find_one({"_id": ObjectId(paymentId)})
             
             if payment is None:
-                raise PaymentException(404, "payment not found.")
+                raise PaymentException(404, "Account not found.")
             
-            paymentData = {
+            accountData = {
             
-            "paymentId": str(payment["_id"]),
-            "paymentDate": payment["paymentDate"],
-            "paymentAmount": payment["paymentAmount"],
-            "paymentStatus": payment["paymentStatus"],
-            "paymentMethod": payment["paymentMethod"],
-            "paymentCurrency": payment["paymentCurrency"],
-            "paymentType": payment["paymentType"],
-            "paymentDescription": payment["paymentDescription"],
-
             "AccountID": payment["AccountID"],
             "AccountName": payment["AccountName"],
             "AccountType": payment["AccountType"],
@@ -89,39 +162,7 @@ class PaymentService:
             "AccountBalance": payment["AccountBalance"],
             "AccountStatus": payment["AccountStatus"],
             "AccountCurrency": payment["AccountCurrency"],
-            "AccountLimit": payment["AccountLimit"],
-
-            "created_at": payment["created_at"],
-            "updated_at": payment["updated_at"]
-
-            }
-            return {"statusCode": 200, "restaurant": paymentData}
-        
-        except PaymentException as e:
-            raise e
-        except Exception as e:
-            raise PaymentException(500, f"Error fetching restaurant by ID: {str(e)}")
-    
-    def getAccountInPaymentFromSystemById(self, accountId: str):
-        try:
-            account = self.collection.find_one({"_id": ObjectId(accountId), "status": 1})
-            
-            if account is None:
-                raise PaymentException(404, "Account not found.")
-            
-            accountData = {
-            
-            "AccountID": account["AccountID"],
-            "AccountName": account["AccountName"],
-            "AccountType": account["AccountType"],
-            "AccountNumber": account["AccountNumber"],
-            "AccountBalance": account["AccountBalance"],
-            "AccountStatus": account["AccountStatus"],
-            "AccountCurrency": account["AccountCurrency"],
-            "AccountLimit": account["AccountLimit"],
-
-            "created_at": account["created_at"],
-            "updated_at": account["updated_at"]
+            "AccountLimit": payment["AccountLimit"]
 
             }
             return {"statusCode": 200, "account": accountData}
@@ -154,7 +195,8 @@ class PaymentService:
             
             updateData = {
                 "$set": {
-                    "paymentDate": paymentData["paymentDate"],
+                    "created_by": paymentData["created_by"],
+                    "paymentDate": paymentData["paymentDate"].isoformat(),
                     "paymentAmount": paymentData["paymentAmount"],
                     "paymentStatus": paymentData["paymentStatus"],
                     "paymentMethod": paymentData["paymentMethod"],

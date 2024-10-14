@@ -23,11 +23,12 @@ async def createPaymentDetails(paymentMutation: PaymentMutation, userId: str):
         raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {str(e)}")
 
 @router.get("/payments")
-async def retrievePaymentDetail():
+async def retrieveAllPaymentDetail():
     try:
 
         # Call the instance method getPaymentList()
         response = payment_service.getPaymentList()
+        
         
         return JSONResponse(status_code=response["statusCode"], content={
             "message": "Payments fetched successfully", 
@@ -39,14 +40,50 @@ async def retrievePaymentDetail():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {str(e)}")
 
-@router.get("/{paymentId}")
-async def getAccountFromSystem(paymentId: str):
+@router.get("/payments/{userId}")
+async def retrievePaymentDetailByUserID(userId: str):
     try:
-        response = payment_service.getPaymentById(paymentId)
 
+        # Call the instance method getPaymentList()
+        response = payment_service.getAllPaymentsByUserId(userId)
+        print(response)
+        
+        return JSONResponse(status_code=response["statusCode"], content={
+            "message": "Payments fetched successfully", 
+            "payments": response["payments"]  # Corrected key from "restaurants" to "payments"
+        })
+    except PaymentException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {str(e)}")
+
+
+@router.get("/payments/singlePayment/{paymentId}")
+async def retrievePaymentDetailByPaymentID(paymentId: str):
+    try:
+        
+        response = payment_service.getPaymentByPaymentId(paymentId)
+        
+        
+        return JSONResponse(status_code=response["statusCode"], content={
+            "message": "Payments fetched successfully", 
+            "payment": response["payment"]  # Corrected key from "restaurants" to "payments"
+        })
+    except PaymentException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {str(e)}")
+
+@router.get("/account/{paymentId}")
+async def getAccountFromSystemByPaymentId(paymentId: str):
+    try:
+        response = payment_service.getAccountInPaymentFromSystemByPaymentId(paymentId)
+        
         return JSONResponse(status_code=response["statusCode"], content={
             "message": "Payment fetched successfully", 
-            "payment": response["payment"]
+            "account": response["account"]
         })
     except PaymentException as e:
         raise HTTPException(status_code=e.status_code, detail=e.detail)

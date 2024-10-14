@@ -8,7 +8,7 @@ class PaymentMutation(BaseModel):
   
   created_by: str
 
-  paymentID: str
+  
   paymentDate: datetime
   paymentAmount: int
   paymentStatus: str
