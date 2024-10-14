@@ -7,7 +7,7 @@ class Settings(BaseSettings):
 
 
     MONGODB_URI: str = os.getenv("MONGODB_URI", "mongodb+srv://schnatr:vcS0AQDhqKWSi6Tc@clusterzero.6uzvv.mongodb.net/?retryWrites=true&w=majority&appName=ClusterZero")
-    DB_NAME: str = os.getenv("DB_NAME", "RESTAURANT")
+    DB_NAME: str = os.getenv("DB_NAME", "PAYMENT")
     COLLECTION_NAME: str = os.getenv("COLLECTION_NAME", "PAYMENT")
     
 settings = Settings()

@@ -19,9 +19,6 @@ class PaymentService:
         paymentData["created_by"] = userId
         paymentData["created_at"] = datetime.now().strftime("%d%m%Y") 
         paymentData["updated_at"] = datetime.now().strftime("%d%m%Y")
-        
-        if not (Validator.validatePositivePaymentAmount(paymentData["paymentAmount"])):
-           raise PaymentException(400, "payment amount must not be less than 0")
 
         result = self.collection.insert_one(paymentData)
 
@@ -45,7 +42,7 @@ class PaymentService:
                 "fullName" : payment["fullName"],
                 "paymentType" : payment["paymentType"],
                 "creditCardNumber" : payment["creditCardNumber"],
-                "expiredMonth" : payment["expiredMonth"],
+                "expiredMonth" : str(payment["expiredMonth"]),
                 "cvv" : payment["cvv"]
             }
 
