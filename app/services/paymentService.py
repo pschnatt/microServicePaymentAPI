@@ -22,6 +22,14 @@ class PaymentService:
         paymentData["created_at"] = datetime.now().strftime("%d%m%Y") 
         paymentData["updated_at"] = datetime.now().strftime("%d%m%Y")
         
+        if not (Validator.validatePositivePaymentAmount(paymentData["paymentAmount"])):
+           raise PaymentException(400, "payment amount must not be less than 0")
+        
+        # if not (Validator.validateAmount(bookingData["costPerPerson"], 0)):
+        #     raise BookingException(400, "cost must not be less than 1")
+        
+        # if bookingData["reservationDate"]["startFrom"] >= bookingData["reservationDate"]["to"]:
+        #   raise BookingException(400, "'start' time must be earlier than 'to' time.")
 
         result = self.collection.insert_one(paymentData)
 

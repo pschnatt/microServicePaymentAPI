@@ -6,59 +6,66 @@ from unittest.mock import patch
 client = TestClient(app)
 
 def test_createPaymentDetails_ReturnSuccess():
-    userId = "userId123"
+    userId = "1"
     paymentData = {
-        ""
-        "paymentDate": "2024-10-08T09:00:00",
-        "paymentAmount": 100.0,
-        "paymentStatus": "completed",
-        "paymentMethod": "credit_card",
-        "paymentCurrency": "USD",
-        "paymentType": "one-time",
-        "paymentDescription": "Payment for order #123",
 
-        "AccountID": "account123",
-        "AccountName": "Good Eats Account",
-        "AccountType": "business",
-        "AccountNumber": "123456789",
-        "AccountBalance": 1000.0,
-        "AccountStatus": "active",
-        "AccountCurrency": "USD",
-        "AccountLimit": 5000.0,
+    "created_by": "2",
+    "paymentID": "1",
+    "paymentDate": "1",
+    "paymentAmount": 1,
+    "paymentStatus": "Completed",
+    "paymentMethod": "1 Card",
+    "paymentCurrency": "1",
+    "paymentType": "Subsc1ription",
+    "paymentDescription": "1 subscription fee for October 2024",
 
-        "created_at": "2024-10-08T09:00:00",
-        "updated_at": "2024-10-08T09:00:00",
+    "AccountID": "1",
+    "AccountName": "1 Doe",
+    "AccountType": "1",
+    "AccountNumber": "1234567890",
+    "AccountBalance": 5000,
+    "AccountStatus": "Active",
+    "AccountCurrency": "USD",
+    "AccountLimit": 10000,
+
+    "created_at": "2024-10-11T12:45:00Z",
+    "updated_at": "2024-10-11T12:45:00Z"
     }
-    
+
+        
     response = client.post(f"/api/payment/{userId}", json=paymentData)
 
     assert response.status_code == 201
     assert "paymentId" in response.json()
 
-# def test_createPaymentDetails_InvalidData_ReturnError():
-#     userId = "userId123"
-#     paymentData = {
-#         "paymentDate": "2024-10-08T09:00:00",
-#         "paymentAmount": -100.0,  # Invalid amount
-#         "paymentStatus": "completed",
-#         "paymentMethod": "credit_card",
-#         "paymentCurrency": "USD",
-#         "paymentType": "one-time",
-#         "paymentDescription": "Payment for order #123",
-#         "AccountID": "account123",
-#         "AccountName": "Good Eats Account",
-#         "AccountType": "business",
-#         "AccountNumber": "123456789",
-#         "AccountBalance": 1000.0,
-#         "AccountStatus": "active",
-#         "AccountCurrency": "USD",
-#         "AccountLimit": 5000.0,
-#     }
+def test_createPaymentDetails_InvalidData_ReturnError():
+    userId = "userId123"
+    paymentData = {
+        "created_by": "2",
+        "paymentID": "1",
+        "paymentDate": "1",
+        "paymentAmount": -100,
+        "paymentStatus": "Completed",
+        "paymentMethod": "1 Card",
+        "paymentCurrency": "1",
+        "paymentType": "Subsc1ription",
+        "paymentDescription": "1 subscription fee for October 2024",
+        "AccountID": "1",
+        "AccountName": "1 Doe",
+        "AccountType": "1",
+        "AccountNumber": "1234567890",
+        "AccountBalance": 5000,
+        "AccountStatus": "Active",
+        "AccountCurrency": "USD",
+        "AccountLimit": 10000,
+        "created_at": "2024-10-11T12:45:00Z",
+        "updated_at": "2024-10-11T12:45:00Z"
+    }
 
-#     response = client.post(f"/api/payment/{userId}", json=paymentData)
+    response = client.post(f"/api/payment/{userId}", json=paymentData)
 
-#     assert response.status_code == 400
-#     assert response.json()["detail"] == "Payment amount must be a positive number."
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Payment amount must be a positive number."
 
 # def test_retrievePaymentList_ReturnSuccess():
 #     mockResponse = {
