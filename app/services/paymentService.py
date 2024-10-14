@@ -50,7 +50,7 @@ class PaymentService:
             "_id": str(payment["_id"]),
             "created_by": payment["created_by"],
             "paymentId": str(payment["_id"]),
-            "paymentDate": payment["paymentDate"],
+            "paymentDate": payment["paymentDate"].isoformat(),
             "paymentAmount": payment["paymentAmount"],
             "paymentStatus": payment["paymentStatus"],
             "paymentMethod": payment["paymentMethod"],
