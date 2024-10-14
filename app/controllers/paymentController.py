@@ -8,7 +8,7 @@ router = APIRouter()
 payment_service = PaymentService()
 
 # Correct route paths with leading slashes
-@router.post("/{userId}")
+@router.post("/{userId}/create")
 async def createPaymentDetails(paymentMutation: PaymentMutation, userId: str):
     try:
         
@@ -58,7 +58,6 @@ async def retrievePaymentDetailByUserID(userId: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {str(e)}")
 
-
 @router.get("/payments/singlePayment/{paymentId}")
 async def retrievePaymentDetailByPaymentID(paymentId: str):
     try:
@@ -101,3 +100,16 @@ async def updateUserPaymentDetail(paymentMutation: PaymentMutation, paymentId: s
         })
     except PaymentException as e:
         raise HTTPException(status_code=e.status_code, detail=e.detail)
+
+@router.delete("/{userId}/delete/{paymentId}")
+async def deleteUserPaymentDetail(userId: str, paymentId: str):
+    try:
+        response = payment_service.deletePayment(userId, paymentId)
+        return JSONResponse(status_code=response["statusCode"], content={
+            "message": "Payment deleted successfully"
+        })
+    except PaymentException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {str(e)}")

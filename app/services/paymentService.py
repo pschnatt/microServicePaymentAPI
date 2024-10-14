@@ -234,3 +234,22 @@ class PaymentService:
             raise PaymentException(500, f"Error updating payment: {str(e)}")
     
           
+
+    def deletePayment(self, userId: str, paymentId: str):
+        try:
+            payment = self.collection.find_one({"_id": ObjectId(paymentId)})
+
+            if payment is None:
+                raise PaymentException(404, "Payment not found.")
+            
+            if payment["created_by"] != userId:
+                raise PaymentException(403, "You are not authorized to delete this payment.")
+            
+            self.collection.delete_one({"_id": ObjectId(paymentId)})
+
+            return {"statusCode": 200, "message": "Payment deleted successfully."}
+        
+        except PaymentException as e:
+            raise e
+        except Exception as e:
+            raise PaymentException(500, f"Error deleting payment: {str(e)}")
